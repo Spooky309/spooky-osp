@@ -1,6 +1,11 @@
 compile: yes
 running: yes
 
+## what the devil is this?
+This is a dumb little toy kernel I made a while back for fun, it uses paging (poorly) and has the worst memory allocator of all time. But, it does have a terminal driver which works nicely (but lacks a backbuffer) and a custom bootloader that may or may not work on your machine. Although I used many resources for the bootloader, I made a point to avoid using tutorials for a lot of C stuff and kinda freestyle it.
+
+This may be the most useless operating system in existence, as it cannot yet load binaries, or even read from a disk (ATA gives me a serious headache.)
+
 # DEPS:
 * yasm (edit build.sh if you want to use nasm instead)
 * i686-elf-gcc/binutils toolchain

@@ -61,19 +61,6 @@ void cmdAbout() {
     default: writeLine("The world's most useless operating system");
   }
 }
-int* test;
-void cmdMalTest() {
-  writeLine("I'm going to malloc 4 bytes...");
-  test = malloc_32bits();
-  writeLine("It didn't crash, therefore it worked.");
-  return;
-}
-void cmdFreeTest() {
-  writeLine("I'm going to free 4 bytes...");
-  free_32bits(test);
-  writeLine("It didn't crash, therefore it worked.");
-  return;
-}
 void cmdKern() {
   // all i wanted was to feel at home.
   for (int i = 0; i < 6000; i++) {
@@ -84,9 +71,6 @@ void cmdKern() {
   panic(65535);
 }
 void initCmds() {
-  register_command("malloc_test", "test malloc 32 bit func", cmdMalTest);
-  register_command("free_test", "test free 32 bit func", cmdFreeTest);
-  
   register_command("warranty", "display warranty information", cmdWarranty);
   register_command("license", "display license information", cmdWarranty);
   register_command("help", "this command", cmdHelp);

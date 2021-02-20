@@ -180,10 +180,10 @@ Stage3:
   .fill_kerntable:
     mov ecx, ebx
     or ecx, 3
-    mov [0x4000+eax*4], ecx
+    mov [0x01000000+eax*4], ecx
     add ebx, 4096
     inc eax
-    cmp eax, 1024
+    cmp eax, 2048
     je .end_kerntable
     jmp .fill_kerntable
   .end_kerntable:
@@ -191,9 +191,15 @@ Stage3:
   mov ax, id_page_table                    ; address of identity table
   or eax, 3                                ; flags (present, RW, kmode only) 
   mov [page_directory],eax                 ; put it in (that's what she said lmao)
-  mov ax, 0x4000                           ; address of kernel table
+
+  mov eax, 0x01000000                      ; address of kernel table
   or eax, 7                                ; flags (present, RW, umode)
   mov [page_directory+768*4], eax          ; table entry 768 maps to virtual address 0xC0000000
+
+  mov eax, 0x01008000                      ; address of kernel table
+  or eax, 7                                ; flags (present, RW, umode)
+  mov [page_directory+769*4], eax          ; table entry 769 maps to virtual address 0xC0008000
+
   ; enable paging
   mov eax, page_directory
   mov cr3, eax

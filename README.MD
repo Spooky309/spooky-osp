@@ -2,9 +2,10 @@ compile: yes
 running: yes
 
 ## what the devil is this?
-This is a dumb little toy kernel I made a while back for fun, it uses paging (poorly) and has the worst memory allocator of all time. But, it does have a terminal driver which works nicely (but lacks a backbuffer) and a custom bootloader that may or may not work on your machine. Although I used many resources for the bootloader, I made a point to avoid using tutorials for a lot of C stuff and kinda freestyle it.
+This is a dumb little toy kernel I made a while back for fun, it uses paging a heap allocator and has a terminal with commands and stuff. It can't run programs yet and the kernel doesn't load things from the disk (although the bootloader does)
+Right now, it only works with ATA, and the disk that's used has to be a master disk, otherwise the stage 4 bootloader won't work. Sorry, I don't make the rules. 
 
-This may be the most useless operating system in existence, as it cannot yet load binaries, or even read from a disk (ATA gives me a serious headache.)
+This may be the most useless operating system in existence, as it cannot yet load binaries, or schedule.
 
 # DEPS:
 * yasm (edit build.sh if you want to use nasm instead)
@@ -13,7 +14,7 @@ This may be the most useless operating system in existence, as it cannot yet loa
 
 # building and running:
 1. run build.sh from the src directory and it will create build.img in the src directory
-2. load it into fda in bochs or qemu-system-i386 (also tested using a usb drive on real hardware, obligatory "works on my machine")
+2. load it into hda in bochs or qemu-system-i386
 
 # notes:
 1. you can use cygwin to build on windows

@@ -3,7 +3,8 @@
 void clearScreen();
 void putch(const char);
 void puts(const char*);
-void putint(int i);
+void putint(unsigned int i);
+void putintx(unsigned int i);
 void backspace();
 void writeLine(const char*);
 void initTerm();

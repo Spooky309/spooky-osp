@@ -17,6 +17,7 @@ main:
   mov     ax, 0x0000
   mov     ss, ax
   mov     sp, 0xFFFF
+  mov	  [dosDriveNumber], dl
   sti
 	
 LOAD_ROOT:
@@ -74,7 +75,7 @@ LOAD_FAT:
 
   ; read FAT into memory (7C00:1200) (far away from the directory table)           
 
-  mov     bx, WORD 0x0200                       ; copy FAT above bootcode
+  mov     bx, WORD 0x0400                       ; copy FAT above bootcode
   call    ReadSectors                           
 
   ; read image file into memory (0050:0000)     
@@ -105,10 +106,11 @@ LOAD_IMAGE:
   mov     dx, ax                                ; copy current cluster
   shr     dx, 0x0001                            ; divide by two
   add     cx, dx                                ; sum for (3/2)
-  mov     bx, 0x0200                            ; location of FAT in memory
+  mov     bx, 0x0400                            ; location of FAT in memory
   add     bx, cx                                ; index into FAT
   mov     dx, WORD [bx]                         ; read two bytes from FAT
   test    ax, 0x0001
+  jnz     .ODD_CLUSTER
   .EVEN_CLUSTER:
     and     dx, 0000111111111111b               ; take low twelve bits
     jmp     .DONE
@@ -124,7 +126,8 @@ DONE:
   call	  Print
   mov     si, msgCRLF
   call    Print
-  jmp     0x0100:0x0000                         ; far jump to the stage 2 loaded at 0x0500 (this also sets cs)
+  mov     dl, [dosDriveNumber]
+  jmp     0x0100:0x0000                         ; far jump to the stage 2 loaded at 0x1000 (this also sets cs)
 
 FAILURE:
   mov     ah, 0x00

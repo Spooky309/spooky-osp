@@ -1,10 +1,6 @@
-#include "ckern.h"
-#include "scancodes.h"
-#include "term.h"
+#include "st4.h"
 #include "io.h"
-#include "mem.h"
-#include "string.h"
-#include "command.h"
+#include "term.h"
 #define ROWS 25
 #define COLS 80
 #define VIDMEM (unsigned char*)0xB8000
@@ -30,6 +26,7 @@ char thirdrowuppercase[]="ZXCVBNM<>?";
 int tempcaps = 0;
 int capslock = 0;
 char nums[10] = {'0','1','2','3','4','5','6','7','8','9'};
+char numsx[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 void MovCur(unsigned char x, unsigned char y) {
   unsigned short pos = y * COLS + x;
@@ -106,8 +103,6 @@ void putch(const char c) {
 }
 
 void cmdPrompt() {
-  putch('\n');
-  puts("kern@ligmos:/> ");
 }
 // Prints a null-terminated string
 void puts(const char* s) {
@@ -124,13 +119,36 @@ void puts(const char* s) {
 // prints an integer
 // because the digit characters are found in order of least to most significant digit
 // printing them as-is will give us a backward number
-void putint(int i) {
+char chars[128];
+void putint(unsigned int i) {
   int numchars = 0;
   // buffer the chars so we can print them in reverse
-  char chars[128];
+  if (i == 0) {
+    chars[0] = '0';
+	numchars = 1;
+  }
   while (i) {
     chars[numchars] = nums[i % 10];
     i /= 10;
+    numchars++;
+  }
+  numchars--;
+  while (numchars >= 0) {
+    putch(chars[numchars]);
+    numchars--;
+  }
+}
+void putintx(unsigned int i) {
+  int numchars = 0;
+  puts("0x");
+  // buffer the chars so we can print them in reverse
+  if (i == 0) {
+    chars[0] = '0';
+	numchars = 1;
+  }
+  while (i) {
+    chars[numchars] = numsx[i % 16];
+    i /= 16;
     numchars++;
   }
   numchars--;
@@ -172,24 +190,6 @@ void scrollDown(const int lines) {
   setCursorToCurrentPos();
 }
 void processCommand() {
-  if (cmdIt > 0) {
-	int cmdKnown = 0;
-	cmdBuffer[cmdIt] = 0x00; // put a null terminator at the end
-	for (int i = 0; i < CMDS_MAX; i++) {
-		if (strcmp(cmdBuffer, commands[i].cmdText) == 0) {
-			commands[i].execute("");
-			cmdKnown = 1;
-			break;
-		}
-	}
-	if (cmdKnown == 0) {
-		puts("Unknown command \"");
-		puts(cmdBuffer);
-		puts("\"\n");
-	}
-	cmdIt = 0;
-  }
-  cmdPrompt();
 }
 void addCharToCmdBufferAndPrint(char c) {
   if (cmdIt < 1024) {
@@ -200,73 +200,8 @@ void addCharToCmdBufferAndPrint(char c) {
 }
 
 void kbd_input(int scancode) {
-  // first 2 rows (numbers then letters)
-  if (scancode > 1 && scancode < 28) {
-    // first don't do anything if this is a non-character key
-    if (toptwolowercase[scancode] != '#') {
-      if ((capslock ^ tempcaps) == 1) {
-        addCharToCmdBufferAndPrint(toptwouppercase[scancode]);
-      }
-      else {
-        addCharToCmdBufferAndPrint(toptwolowercase[scancode]);
-      }
-    }
-  }
-  // second row
-  if (scancode > 29 && scancode < 42) {
-    if ((capslock ^ tempcaps) == 1) {
-      addCharToCmdBufferAndPrint(secondrowuppercase[scancode - 30]);
-    }
-    else {
-      addCharToCmdBufferAndPrint(secondrowlowercase[scancode - 30]);
-    }
-  }
-  // third row
-  if (scancode > 43 && scancode < 54) {
-    if ((capslock ^ tempcaps) == 1) {
-      addCharToCmdBufferAndPrint(thirdrowuppercase[scancode - 44]);
-    }
-    else {
-      addCharToCmdBufferAndPrint(thirdrowlowercase[scancode - 44]);
-    }
-  }
-  // special keys
-  if (scancode == SC_CAPSLOCK_DOWN) {
-    if (capslock == 1) {
-      capslock = 0;
-      return;
-    }
-    capslock = 1;
-    return;
-  }
-  if (scancode == SC_SHIFT_DOWN || scancode == SC_LSHIFT_DOWN) {
-    tempcaps = 1;
-    return;
-  }
-  if (scancode == SC_SHIFT_UP || scancode == SC_LSHIFT_UP) {
-    tempcaps = 0;
-    return;
-  }
-  if (scancode == SC_SPACE_DOWN) {
-    addCharToCmdBufferAndPrint(' ');
-  }
-  if (scancode == SC_ENTER_DOWN) {
-    putch('\n');
-    processCommand();
-  }
-  if (scancode == SC_BACKSPACE_DOWN) {
-    backspace();
-  }
-  setCursorToCurrentPos();
 }
 
 void initTerm() {
-  puts("Welcome to ligmOS ");
-  writeLine(VERSION);
-  //writeLine("Copyright (C) 2018 Kole \"Spooky\"");
-  //writeLine("ligmOS comes with ABSOLUTELY NO WARRANTY; type `warranty` for details");
-  //writeLine("This is free software, and you are welcome to redistribute it");
-  //writeLine("under certain conditions; type `license` for details");
-  writeLine("32 bit paged protected mode\nKernel is mapped at 0xC0000000 (ELF header 0xC0000000-0xC0000FFF)");
-  initCmds();
+	writeLine("Spooky's Jankfest Bootloader II\n");
 }

@@ -13,7 +13,7 @@ typedef struct _mem_header_c
 
 void* heap;
 size_t heap_size;
-extern const void* _heap_begin;
+void* _heap_begin;
 
 int mem_self_test(void)
 {
@@ -63,7 +63,7 @@ void mem_init(size_t init_heap_size)
     writeLine("Early: Init Memory");
     putint((size_t)_heap_begin);
     putch('\n');
-    heap = (void*)0xC0008000;
+    heap = (void*)0xC0400000;
     for (size_t i = 0; i < init_heap_size; i++)
     {
       ((char*)heap)[i] = 0x00;

@@ -18,6 +18,15 @@ inline uint8_t inb(uint16_t port) {
   io_wait();
   return ret;
 }
+inline uint16_t inw(uint16_t port)
+{
+	uint16_t ret;
+	asm volatile ( "inw %1, %0"
+				   : "=a"(ret)
+				   : "Nd"(port) );
+	io_wait();
+	return ret;
+}
 inline void PIC_EOI(unsigned char irq) {
   if (irq >= 8)
     outb(0xA0, 0x20);

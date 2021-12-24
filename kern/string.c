@@ -23,3 +23,12 @@ int strcmp(const char* s1, const char* s2) {
   }
   return ident;
 }
+
+int strcmps(unsigned char* a, unsigned char* b, unsigned long len)
+{
+	for (unsigned long i = 0; i < len; i++)
+	{
+		if (a[i] != b[i]) return 0;
+	}
+	return 1;
+}

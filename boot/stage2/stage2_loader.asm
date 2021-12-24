@@ -115,6 +115,20 @@ gdt:
   db 10010010b                             ; access flags
   db 11001111b                             ; granularity flags (+limit high nibble)
   db 0                                     ; base high byte
+; 0x18 r3_code:
+  dw 0xFFFF
+  dw 0x0000
+  db 0
+  db 11111010b
+  db 11001111b
+  db 0
+; 0x20 r3_data:
+  dw 0xFFFF                                ; limit low word
+  dw 0x0000                                ; base low word
+  db 0                                     ; base mid byte
+  db 11110010b                             ; access flags
+  db 11001111b                             ; granularity flags (+limit high nibble)
+  db 0                                     ; base high byte
 gdt_end:
 gdt_desc:
   dw gdt_end - gdt - 1

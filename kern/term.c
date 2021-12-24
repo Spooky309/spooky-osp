@@ -30,6 +30,7 @@ char thirdrowuppercase[]="ZXCVBNM<>?";
 int tempcaps = 0;
 int capslock = 0;
 char nums[10] = {'0','1','2','3','4','5','6','7','8','9'};
+char numsx[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 void MovCur(unsigned char x, unsigned char y) {
   unsigned short pos = y * COLS + x;
@@ -124,13 +125,34 @@ void puts(const char* s) {
 // prints an integer
 // because the digit characters are found in order of least to most significant digit
 // printing them as-is will give us a backward number
+
 void putint(int i) {
   int numchars = 0;
-  // buffer the chars so we can print them in reverse
   char chars[128];
+  // buffer the chars so we can print them in reverse
   while (i) {
     chars[numchars] = nums[i % 10];
     i /= 10;
+    numchars++;
+  }
+  numchars--;
+  while (numchars >= 0) {
+    putch(chars[numchars]);
+    numchars--;
+  }
+}
+void putintx(unsigned int i) {
+  int numchars = 0;
+  char chars[128];
+  puts("0x");
+  // buffer the chars so we can print them in reverse
+  if (i == 0) {
+    chars[0] = '0';
+	numchars = 1;
+  }
+  while (i) {
+    chars[numchars] = numsx[i % 16];
+    i /= 16;
     numchars++;
   }
   numchars--;

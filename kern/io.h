@@ -18,9 +18,31 @@ inline uint8_t inb(uint16_t port) {
   io_wait();
   return ret;
 }
+inline uint16_t inw(uint16_t port)
+{
+	uint16_t ret;
+	asm volatile ( "inw %1, %0"
+				   : "=a"(ret)
+				   : "Nd"(port) );
+	io_wait();
+	return ret;
+}
 inline void PIC_EOI(unsigned char irq) {
   if (irq >= 8)
     outb(0xA0, 0x20);
   outb(0x20, 0x20);
 }
+
+inline void wrmsr(unsigned long msr, uint64_t value)
+{
+	asm volatile ( "wrmsr" : : "c" (msr), "A" (value) );
+}
+
+inline uint64_t rdmsr(unsigned long msr)
+{
+	uint64_t v;
+	asm volatile ( "rdmsr" : "=A" (v) : "c" (msr) );
+	return v;
+}
+
 #endif

@@ -1,2 +1,3 @@
 build.img
 out/*
+fs/TPROG.ELF

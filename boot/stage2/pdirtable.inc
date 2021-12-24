@@ -1,7 +1,6 @@
 %ifndef _PGTBL_
 %define _PGTBL_
-times 4096-($-$$) db 0xBF
-;times 0x500 db 0xBF ; additional padding due to where we are loaded
+times 4096-($-$$) db 0x00 ; 4KiB alignment
 id_page_table:
 	; 1024 empty 4 byte entries, this will be filled by code (or a macro)
 	; this SHOULD occupy exactly 4KiB in the image...

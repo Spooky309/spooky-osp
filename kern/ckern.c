@@ -1,15 +1,54 @@
 #include "term.h"
 #include "interrupt.h"
 #include "ckern.h"
+#include "disk.h"
 #include "mem.h"
+#include "elf.h"
+#include "command.h"
+#include "syscall.h"
+
+void runcmd(void)
+{
+	void* buf;
+	unsigned long fileSz = LoadFile("TPROG   ELF", &buf);
+	if (fileSz != 0)
+	{
+    void* sectBegin;
+    unsigned long sectSz;
+		PROGMAINFUN ent = PutELF(buf, &sectBegin, &sectSz);
+		if (ent != 0)
+		{
+      // TODO: Set up a page that maps the elf to its vaddr
+
+			ent(); // call into main
+		}
+	}
+  free(buf);
+}
 
 int kmain(void) {
-  mem_init(4096); // heap size 4KiB
+  mem_init(0x400000); // heap size 4MiB
   idt_init();
   initTerm();
-  writeLine("Malloc-ing pointer, init to 100, times dereference by 1000.\nResults should be 100, 100000");
+  InitDisk();
+  InitSyscall();
+  writeLine("TODO: ???");
+  char* fileContent = 0;
   
-  writeLine("TODO: proper memory management, disk reading.");
+  if (LoadFile("TEST    TXT", (void**)&fileContent) != 0)
+  {
+	  puts("Loaded TEST.TXT to ");
+	  putintx(fileContent);
+	  writeLine(". I'm going to print its contents:\n");
+	  writeLine(fileContent);
+  }
+  else
+  {
+	  writeLine("TEST.TXT wasn't found therefore I cannot test.");
+  }
+  if (fileContent != 0) free(fileContent);
+  
+  register_command("runtest", "run TPROG.ELF", runcmd);
   cmdPrompt();
   while(1) {
     asm("hlt"); // stop until we receive some interrupt
@@ -18,20 +57,20 @@ int kmain(void) {
 }
 
 void panic(unsigned int errcode) {
-  //clearScreen();
   // i didn't really think this one through so i can't actually get an error code from the ISR.
   // pls fix
-  // everything panics right now, because systems aren't detailed enough to handle exceptions gracefully
-  writeLine("\nI've got problems. Sorry.");
-  puts("Code ");
-  putint(errcode);
-  putch('\n');
+  puts("\nFatal Error ");
+  putintx(errcode);
+  puts(": ");
   switch (errcode) {
   case 0:
 	writeLine("Mysterious Internal CPU Exception");
 	break;
   case 1:
 	writeLine("Ran out of memory on kernel heap.");
+	break;
+  case 2:
+	writeLine("See above.");
 	break;
   case 65536:
 	writeLine("I said no anime.");
@@ -43,7 +82,7 @@ void panic(unsigned int errcode) {
         writeLine("allan please add details");
         break;
   }
-  if (errcode != 65535) writeLine("\nKernel got ligma... halting. Reboot at your leisure.");
+  if (errcode != 65535) writeLine("panic.");
   // halt and catch fire
   while (1)
   {
